@@ -39,6 +39,7 @@ async fn main() -> Result<()> {
 
     // Build router
     let app = routes::create_router(state)
+        .layer(axum::middleware::from_fn(middleware::add_branding_headers))
         .layer(CorsLayer::permissive())
         .layer(TraceLayer::new_for_http());
 

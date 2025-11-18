@@ -32,6 +32,18 @@ Error responses:
 }
 ```
 
+## Response Headers
+
+All API responses include the following branding headers:
+
+```
+X-Powered-By: Folonite
+X-Folonite-Version: 2026-01
+X-Folonite-Request-ID: <unique-uuid>
+```
+
+The `X-Folonite-Request-ID` header contains a unique UUID for each request, which can be used for tracking and debugging.
+
 ## Endpoints
 
 ### Health & Status

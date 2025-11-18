@@ -200,6 +200,11 @@ pub async fn api_docs() -> Html<String> {
   "data": { ... },
   "error": null
 }</pre>
+            <h3>Response Headers</h3>
+            <p>All responses include Folonite branding headers:</p>
+            <pre>X-Powered-By: Folonite
+X-Folonite-Version: 2026-01
+X-Folonite-Request-ID: &lt;unique-uuid&gt;</pre>
         </div>
     </div>
 </body>
