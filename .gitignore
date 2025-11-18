@@ -1,0 +1,37 @@
+# Rust
+/target
+**/*.rs.bk
+*.pdb
+Cargo.lock
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Data
+data/
+*.db
+*.sqlite
+
+# Neo4j
+neo4j-data/
+neo4j-logs/
+
+# Redis
+dump.rdb

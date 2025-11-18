@@ -1,0 +1,38 @@
+# Git
+.git
+.gitignore
+
+# Build artifacts
+target/
+**/target/
+**/*.rs.bk
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docs
+docs/
+*.md
+!README.md
+
+# Docker
+docker-compose.yml
+Dockerfile
+
+# Data
+data/
+neo4j-data/
+neo4j-logs/
+dump.rdb
+
+# Misc
+.DS_Store
+*.log
