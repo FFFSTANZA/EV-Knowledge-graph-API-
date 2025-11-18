@@ -3,6 +3,7 @@ mod handlers;
 mod middleware;
 mod routes;
 mod state;
+mod types;
 
 use anyhow::Result;
 use config::AppConfig;

@@ -1,3 +1,7 @@
+pub mod rate_limit;
+pub mod auth;
+pub mod metrics;
+
 use axum::{
     body::Body,
     http::{Request, Response, HeaderValue},
@@ -13,6 +17,10 @@ pub async fn add_branding_headers(
     // Generate unique request ID
     let request_id = Uuid::new_v4().to_string();
 
+    // Add request ID to extensions for logging
+    let mut request = request;
+    request.extensions_mut().insert(request_id.clone());
+
     // Process the request
     let mut response = next.run(request).await;
 
@@ -27,12 +35,4 @@ pub async fn add_branding_headers(
     }
 
     response
-}
-
-pub mod rate_limit {
-    // TODO: Implement rate limiting using Redis
-}
-
-pub mod auth {
-    // TODO: Implement API key authentication
 }

@@ -5,6 +5,8 @@ pub mod chargers;
 pub mod compatibility;
 pub mod queries;
 pub mod recommendations;
+pub mod admin;
+pub mod batch;
 
 use axum::{
     http::StatusCode,
@@ -17,8 +19,14 @@ use serde::Serialize;
 #[derive(Serialize)]
 pub struct ApiResponse<T> {
     pub success: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub data: Option<T>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error_code: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
 }
 
 impl<T: Serialize> ApiResponse<T> {
@@ -27,6 +35,18 @@ impl<T: Serialize> ApiResponse<T> {
             success: true,
             data: Some(data),
             error: None,
+            error_code: None,
+            details: None,
+        }
+    }
+
+    pub fn error_with_code(message: String, code: String) -> ApiResponse<()> {
+        ApiResponse {
+            success: false,
+            data: None,
+            error: Some(message),
+            error_code: Some(code),
+            details: None,
         }
     }
 
@@ -35,6 +55,8 @@ impl<T: Serialize> ApiResponse<T> {
             success: false,
             data: None,
             error: Some(message),
+            error_code: None,
+            details: None,
         }
     }
 }
@@ -44,17 +66,35 @@ pub enum ApiError {
     NotFound(String),
     BadRequest(String),
     Internal(String),
+    Unauthorized(String),
+    Forbidden(String),
+    RateLimitExceeded,
 }
 
 impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
-        let (status, message) = match self {
-            ApiError::NotFound(msg) => (StatusCode::NOT_FOUND, msg),
-            ApiError::BadRequest(msg) => (StatusCode::BAD_REQUEST, msg),
-            ApiError::Internal(msg) => (StatusCode::INTERNAL_SERVER_ERROR, msg),
+        let (status, message, code) = match &self {
+            ApiError::NotFound(msg) => (StatusCode::NOT_FOUND, msg.clone(), "NOT_FOUND"),
+            ApiError::BadRequest(msg) => (StatusCode::BAD_REQUEST, msg.clone(), "BAD_REQUEST"),
+            ApiError::Unauthorized(msg) => (StatusCode::UNAUTHORIZED, msg.clone(), "UNAUTHORIZED"),
+            ApiError::Forbidden(msg) => (StatusCode::FORBIDDEN, msg.clone(), "FORBIDDEN"),
+            ApiError::RateLimitExceeded => (
+                StatusCode::TOO_MANY_REQUESTS,
+                "Rate limit exceeded".to_string(),
+                "RATE_LIMIT_EXCEEDED",
+            ),
+            ApiError::Internal(msg) => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                msg.clone(),
+                "INTERNAL_ERROR",
+            ),
         };
 
-        (status, Json(ApiResponse::<()>::error(message))).into_response()
+        (
+            status,
+            Json(ApiResponse::<()>::error_with_code(message, code.to_string())),
+        )
+            .into_response()
     }
 }
 
